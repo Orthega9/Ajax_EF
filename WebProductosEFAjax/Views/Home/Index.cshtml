@@ -1,0 +1,463 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Productos</h2>
+<br />
+
+<div id="formulario" style="display:none">
+    <table>
+        <tr>
+            <th style="width:10%; text-align:right">Nombre</th>
+            <td>
+                <input type="hidden" id="idProducto" name="id" value="" />
+                @Html.TextBox("Nombre", null, new { @class = "form-control", id = "Nombre" })
+            </td>
+        </tr>
+        <tr>
+            <th style="width:10%; text-align:right">Precio</th>
+            <td>
+                @Html.TextBox("Precio", null, new { @class = "form-control", id = "Precio" })
+            </td>
+        </tr>
+        <tr>
+            <th style="width:10%; text-align:right">Categoría</th>
+            <td>
+                <select id="CategoriaId" class="form-control">
+                    <option value="">text</option>
+                </select>
+            </td>
+        </tr>
+        <tr >
+            <td style="width:10%; text-align:right">
+                <input type="button" name="btn" id="btn-Cancelar" value="Cancelar" class="btn btn-danger" onclick="OcultarFormulario()" />
+            </td>
+            <td>
+                <input type="button" name="btn" id="btn-Agregar" value="Agregar" class="btn btn-success" style="display:none" onclick="AgregarPost()" />
+                <input type="button" name="btn" id="btn-Editar" value="Editar" class="btn btn-primary" style="display:none" onclick="EditarPost()" />
+                <input type="button" name="btn" id="btn-Eliminar" value="Eliminar" class="btn btn-danger" style="display:none" onclick="EliminarPost()" />
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="tabla">
+
+    <form>
+        <table>
+            <tr>
+                <td>
+                    <input type="text" id="idNombre" name="id" value="" class="form-control" />
+                </td>
+                <td></td>
+                <td>Categoría</td>
+                <td>
+                    <select id="CategoriaID" class="form-control">                        
+                        <option value="">text</option>
+                    </select>
+                </td>
+                <td>
+                    <input type="button" name="btn" value="Buscar" class="btn btn-primary" onclick="BuscarNombre(), BuscarPorCategoria()" />
+                </td>
+            </tr>
+        </table>
+    </form>
+
+    <br />
+    <a href="#" id="lnkAgregar" onclick="AgregarGet('a','post')">Agregar</a>
+    <br />
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>PrecioIVA</th>
+                <th>Categoria</th>
+                <th>Editar</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody id="tbody">
+            <tr>
+                <td>
+                    producto
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<script src="~/Scripts/jquery-1.10.2.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        MostrarTabla();
+        DropBuscar();
+    });
+
+    function LlenarTabla(list)
+    {
+        var t = '';
+        $.each(list, function (i, producto) {
+
+            t += '<tr>';
+            t += '<td>';
+            t += producto.Nombre;
+            t += '</td>';
+
+            t += '<td>';
+            t += producto.Precio;
+            t += '</td>';
+
+            t += '<td>';
+            t += producto.PrecioIVA;
+            t += '</td>';
+
+            t += '<td>';
+            t += producto.Descripcion;
+            t += '</td>';
+            
+            t += '<td>'
+            t += '<a href = "#" id = "lnkEditar" onclick = "return ObtenerProducto('+ producto.id +',\'e\', \'post\')">Editar</a>'
+            t += '</td>'
+            t += '<td>'
+            t += '<a href = "#" id = "lnkEliminar" onclick = "return ObtenerProducto(' + producto.id + ',\'b\', \'get\')">Eliminar</a>'
+            t += '</td>'
+
+            t += '</tr>';
+        });
+
+        $("#tbody").empty();
+        $("#tbody").html(t);
+    }
+
+    function OcultarFormulario() {
+        $("#formulario").hide();
+        $("#tabla").show();
+
+        $("#Nombre").val('');
+        $("#Precio").val('');
+        $("#CategoriaId").val('');
+    }
+    function MostrarTabla()
+    {
+            $.ajax({
+                type: "GET",
+                url: "/Home/ListaProducto",
+                dataType: "JSON",
+                dataContent:"application/json; charset=utf-8",
+                success: function (res) {
+                    if (res.r == "ok") {
+                        LlenarTabla(res.listaP);
+                        OcultarFormulario();
+                    }
+                    else {
+                        alert(res);
+                    }
+                },
+                error: function (objXMLHttpRequest) {
+                    alert(objXMLHttpRequest);
+                }
+            });
+    }
+
+    function AgregarGet(bandera, banderaDos)
+    {
+        $.ajax({
+            type: "GET",
+            url: "/Home/ListaCategoria",
+            dataType: "JSON",
+            dataContent: "charset=utf8",
+            success: function(res)
+            {
+                var c = '<option value = "0">Seleccionar...</option>';
+                if (res.r == "ok") {
+                    $.each(res.listaC, function (i, categoria) {
+                        c += '<option value = '+ categoria.IdCategoria +'>';
+                        c += categoria.Descripcion;
+                        c += '</option>';
+                    });
+
+                    $("#CategoriaId").empty();
+                    $("#CategoriaId").html(c);
+
+                   
+                    MostrarFormulario();
+                    MostrarBoton(bandera);
+                    deshabilitar(banderaDos);
+                }
+                else
+                {
+                    alert(res);
+                }
+            },
+            error: function(objXMLHttpRequest)
+            {
+                alert(objXMLHttpRequest);
+            }
+        });
+    }
+
+    function MostrarFormulario()
+    {        
+        $("#formulario").show();
+        $("#tabla").hide();
+    }
+
+    function AgregarPost()
+    {
+        debugger;
+        var nombre = $("#Nombre").val();
+        var precio = $("#Precio").val();
+        //var precioIva = $("#PrecioIVA").val();
+        var categoria = $("#CategoriaId").val();
+
+        var ent={
+            Nombre: nombre,
+            Precio: precio,
+            //PrecioIVA: precioIva,
+            CategoriaId:categoria
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/Home/Agregar",
+            dataType: "JSON",
+            contentType: "application/Json; charset=utf-8;",
+            data: JSON.stringify(ent),
+            success: function(res)
+            {
+                if (res == "ok") {
+                    MostrarTabla();
+                    OcultarFormulario();
+                }
+                else
+                {
+                    alert(res);
+                }
+            },
+            error: function(objXMLHttpRequest)
+            {
+                alert(objXMLHttpRequest);
+            }
+        });
+    }
+
+    function ObtenerProducto(id,bandera, banderaDos)
+    {
+        AgregarGet();
+        $.ajax({
+            type: "GET",
+            url: "/Home/ObtenerProducto/" + id,
+            dataType: "JSON",
+            contentType: "application/json; charset=utf-8",
+            success: function(res)
+            {
+                if (res.entProducto.Nombre != null)
+                {
+                    debugger;
+                    $("#idProducto").val(res.entProducto.id);
+                    $("#Nombre").val(res.entProducto.Nombre);
+                    $("#Precio").val(res.entProducto.Precio);
+                    $("#CategoriaId").val(res.entProducto.CategoriaId);
+
+                    MostrarBoton(bandera);
+
+                    MostrarFormulario();
+
+                    deshabilitar(banderaDos);
+                }
+                else
+                {
+                    alert(res);
+                }
+            },
+            error: function (objXMLHttpRequest) {
+                alert(objXMLHttpRequest);
+            }
+        })
+    }
+
+    function EditarPost()
+    {
+        var IdPro = $("#idProducto").val();
+        var nombre = $("#Nombre").val();
+        var precio = $("#Precio").val();
+        var categoria = $("#CategoriaId").val();
+
+        var ent = {
+            id: IdPro,
+            Nombre: nombre,
+            Precio: precio,
+            CategoriaId: categoria
+        };
+
+        $.ajax({
+            type: "POST",
+            url: "/Home/Editar/",
+            dataType: "JSON",
+            contentType: "application/Json; charset=utf-8;",
+            data: JSON.stringify(ent),
+            success: function (res) {
+                if (res == "ok") {
+                    MostrarTabla();
+                    OcultarFormulario();
+                }
+                else {
+                    alert(res);
+                }
+            },
+            error: function (objXMLHttpRequest) {
+                alert(objXMLHttpRequest);
+            }
+        });
+    }
+
+    function MostrarBoton(bandera)
+    {
+        if (bandera == "e") {//editar
+          
+            $("#btn-Editar").show();
+            $("#btn-Eliminar").hide();
+            $("#btn-Agregar").hide();
+        }
+        if (bandera == "a") {//agregar
+            
+            $("#btn-Editar").hide();
+            $("#btn-Eliminar").hide();
+            $("#btn-Agregar").show();
+        }
+        if (bandera == "b") {//borrar
+            
+            $("#btn-Editar").hide();
+            $("#btn-Eliminar").show();
+            $("#btn-Agregar").hide();
+        }
+        
+    }
+
+    function deshabilitar(banderaDos)
+    {
+        debugger;
+        if (banderaDos == 'get')//borrar/eliminar
+        {
+            debugger;
+            document.getElementById("Nombre").readOnly = true;
+            document.getElementById("Precio").readOnly = true;
+            document.getElementById("CategoriaId").disabled = true;
+        }
+        if (banderaDos == 'post')//agregar/editar
+        {
+            debugger;
+            document.getElementById("Nombre").readOnly = false;
+            document.getElementById("Precio").readOnly = false;
+            document.getElementById("CategoriaId").disabled = false;
+        }
+    }
+
+    function EliminarPost()
+    {
+        var Id = $("#idProducto").val();
+        $.ajax({
+            type: "POST",
+            url: "/Home/Eliminar/" + Id,
+            dataType: "JSON",
+            contentType: "application/json; charset=utf-8",
+            success: function(res)
+            {
+                if (res == "ok") {
+                    MostrarTabla();
+                    OcultarFormulario();
+                }
+                else
+                {
+                    alert(res);
+                }
+            },
+            error: function(objXMLHttpRequest)
+            {
+                alert(objXMLHttpRequest);
+            }
+        })
+    }
+
+    function DropBuscar()
+    {
+        debugger;
+        $.ajax({
+            type: "GET",
+            url: "/Home/ListaCategoria",
+            dataType: "JSON",
+            dataContent: "charset=utf8",
+            success: function (res) {
+                var c = '<option value = "0">Seleccionar...</option>';
+                if (res.r == "ok") {
+                    $.each(res.listaC, function (i, categoria) {
+                        c += '<option value = ' + categoria.IdCategoria + '>';
+                        c += categoria.Descripcion;
+                        c += '</option>';
+                    });
+
+                    $("#CategoriaID").empty();
+                    $("#CategoriaID").html(c);
+
+                }
+                else {
+                    alert(res);
+                }
+            },
+            error: function (objXMLHttpRequest) {
+                alert(objXMLHttpRequest);
+            }
+        });
+    }
+
+    function BuscarPorCategoria()
+    {
+        var IDCAT = $("#CategoriaID").val();
+        $.ajax({
+            type: "GET",
+            url: "/Home/BuscarCategoria/" + IDCAT,
+            dataType: "JSON",
+            contentType: "application/json; charset=utf-8",
+            success: function(res)
+            {
+                if (res.r == "ok") {
+                    LlenarTabla(res.listaB);
+                    OcultarFormulario();
+                }
+                else {
+                    alert(res);
+                }
+            },
+            error: function (objXMLHttpRequest) {
+                alert(objXMLHttpRequest);
+            }
+        });
+    }
+
+    function BuscarNombre()
+    {
+       
+        var nombre = $("#idNombre").val();
+        $.ajax({
+            type: "GET",
+            url: "/Home/BuscarNombre/" + nombre,
+            dataType: "JSON",
+            contentType: "application/json; charset=utf-8",
+            success: function (res) {
+                if (res.r == "ok") {
+                    LlenarTabla(res.listaB);
+                    OcultarFormulario();
+                }
+                else {
+                    alert(res);
+                }
+            },
+            error: function (objXMLHttpRequest) {
+                alert(objXMLHttpRequest);
+            }
+        });
+    }
+</script>

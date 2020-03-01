@@ -1,0 +1,10 @@
+F:\ISABEL VM\SolProductosEFAjax\ADOProductos\bin\Debug\ADOProductos.dll.config
+F:\ISABEL VM\SolProductosEFAjax\ADOProductos\bin\Debug\ADOProductos.dll
+F:\ISABEL VM\SolProductosEFAjax\ADOProductos\bin\Debug\ADOProductos.pdb
+F:\ISABEL VM\SolProductosEFAjax\ADOProductos\bin\Debug\EntityFramework.dll
+F:\ISABEL VM\SolProductosEFAjax\ADOProductos\bin\Debug\EntityFramework.SqlServer.dll
+F:\ISABEL VM\SolProductosEFAjax\ADOProductos\bin\Debug\EntityFramework.xml
+F:\ISABEL VM\SolProductosEFAjax\ADOProductos\bin\Debug\EntityFramework.SqlServer.xml
+F:\ISABEL VM\SolProductosEFAjax\ADOProductos\obj\Debug\DAOProductos.csprojResolveAssemblyReference.cache
+F:\ISABEL VM\SolProductosEFAjax\ADOProductos\obj\Debug\ADOProductos.dll
+F:\ISABEL VM\SolProductosEFAjax\ADOProductos\obj\Debug\ADOProductos.pdb
